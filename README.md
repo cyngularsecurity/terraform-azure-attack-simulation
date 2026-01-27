@@ -8,19 +8,76 @@ This Terraform configuration automates the setup of Azure resources for penetrat
 2. **Azure CLI** installed and authenticated (`az login`)
 3. Appropriate Azure subscription permissions
 
-## What This Creates
+## 🔧 Prerequisites
 
-- Resource Group
-- Virtual Network and Subnet
-- Network Security Group (with SSH access)
-- Public IP Address
-- Network Interface
-- Virtual Machine (Ubuntu 22.04) with System-Assigned Managed Identity
-- SSH Key Pair (RSA 4096-bit)
-- Key Vault
-- Storage Account
-- Function App with dedicated storage
-- IAM Role Assignments
+### Required Tools
+
+1. **Terraform** >= 1.0
+   ```bash
+   terraform --version
+   ```
+
+2. **Azure CLI** installed and authenticated
+   ```bash
+   az --version
+   az login
+   ```
+
+3. **curl** (for getting your IP address)
+   ```bash
+   curl --version
+   ```
+
+### Azure Permissions
+
+Your Azure account needs:
+- **Contributor** role on subscription or resource group
+- **User Access Administrator** role (for RBAC assignments)
+
+Verify your permissions:
+```bash
+az role assignment list --assignee $(az account show --query user.name -o tsv) --output table
+```
+
+### Get Your Subscription ID
+
+```bash
+az account show --query id --output tsv
+```
+
+## Configuration
+
+### Module Structure
+
+``` hcl
+
+# Deploy Penetration Testing Infrastructure
+module "azure_pentest" {
+  source = "./modules/azure-pentest"
+
+  # Required Configuration
+  subscription_id = var.subscription_id  # Get with: az account show --query id -o tsv
+
+  # Basic Configuration
+  resource_group_name = var.resource_group_name  # Container for all resources
+  location            = var.location              # Azure region (e.g., eastus, westus2)
+  vm_name             = var.vm_name               # VM name
+  vm_size             = var.vm_size               # VM size (Standard_B2s recommended)
+  admin_username      = var.admin_username        # SSH username
+
+  # Network Configuration
+  vnet_address_space     = var.vnet_address_space      # VNet CIDR (e.g., ["10.0.0.0/16"])
+  subnet_address_prefix  = var.subnet_address_prefix   # Subnet CIDR (e.g., ["10.0.1.0/24"])
+  allowed_ssh_source_ips = var.allowed_ssh_source_ips  # Your IP only! 
+
+  # Target Resources (must be globally unique)
+  keyvault_name         = var.keyvault_name          # 3-24 chars, alphanumeric + hyphens
+  storage_account_name  = var.storage_account_name   # 3-24 chars, lowercase alphanumeric only
+  function_storage_name = var.function_storage_name  # 3-24 chars, lowercase alphanumeric only
+  function_app_name     = var.function_app_name      # Globally unique function name
+}
+```
+
 
 ## Usage
 
@@ -72,6 +129,29 @@ These files contain sensitive data and should **never** be committed:
 ssh -i ./azure_attack.pem azureuser@<PUBLIC_IP>
 ```
 
+## Project Structure
+
+```
+azure-pentest-terraform/
+├── main.tf                          # Root Terraform configuration
+├── variables.tf                     # Root variables
+├── outputs.tf                       # Root outputs
+├── .gitignore                       # Git ignore rules
+├── README.md                        # This file
+├── modules/
+│   └── azure-pentest/               # Main module
+│       ├── main.tf                  # Module configuration
+│       ├── resource_group.tf        # Resource group
+│       ├── network.tf               # Networking resources
+│       ├── vm.tf                    # Virtual machine
+│       ├── ssh_keys.tf              # SSH key generation
+│       ├── iam.tf                   # RBAC roles
+│       ├── target_resources.tf      # Key Vault, Storage, Functions
+│       ├── attack_targets.tf        # Service Principal
+│       ├── variables.tf             # Module variables
+│       └── outputs.tf               # Module outputs
+
+```
 
 ## Cleanup
 
