@@ -1,14 +1,14 @@
 terraform {
-  required_version = ">= 1.0"
+  required_version = ">= 1.9.5"
 
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.0"
+      version = "4.54.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = "~> 2.0"
+      version = "3.2.0"
     }
   }
 }
@@ -23,6 +23,8 @@ provider "azurerm" {
 
 module "azure_pentest" {
   source = "./modules/azure_pentest"
+
+  subscription_id = var.subscription_id
 
   resource_group_name = var.resource_group_name
   location            = var.location

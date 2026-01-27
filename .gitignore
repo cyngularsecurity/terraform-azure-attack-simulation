@@ -3,6 +3,10 @@
 *.tfstate
 *.tfstate.*
 
+.terraform.lock.hcl
+*.tfplan
+
+
 crash.log
 crash.log.*
 
@@ -34,3 +38,4 @@ modules/**/generated/
 modules/**/.env
 modules/**/*.pem
 modules/**/*.zip
+modules/**/func_deploy/

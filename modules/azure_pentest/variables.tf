@@ -1,3 +1,9 @@
+variable "subscription_id" {
+  description = "Client subscription ID"
+  type        = string
+  nullable    = false
+}
+
 variable "resource_group_name" {
   description = "Name of the resource group"
   type        = string
