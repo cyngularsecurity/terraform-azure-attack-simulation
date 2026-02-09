@@ -144,7 +144,6 @@ azure-attack-simulation/
         ├── iam.tf                   # RBAC role assignments
         ├── target_resources.tf      # Key Vault, Storage, Function App
         ├── attack_targets.tf        # Target Service Principal
-        ├── graph_api_permissions.tf # Graph API permissions (optional)
         └── outputs.tf               # Module outputs
 ```
 
