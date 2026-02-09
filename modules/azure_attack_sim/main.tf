@@ -39,8 +39,7 @@ resource "local_file" "dotenv" {
 # Path to the SSH private key for the target VM
 SSH_KEY_PATH=./azure_attack.pem
 # Public IP address of the target Azure VM
-AZURE_VM_PUBLIC_IP=${azurerm_public_ip.pentest.ip_address}
-# SSH username for the target VM (default: azureuser)
+AZURE_VM_PUBLIC_IP=${azurerm_public_ip.attack_sim.ip_address}
 AZURE_VM_USERNAME=${var.admin_username}
 
 #=====Azure Environment Settings=====
@@ -48,19 +47,19 @@ AZURE_VM_USERNAME=${var.admin_username}
 # Azure Subscription ID where the target resources are located
 AZURE_SUBSCRIPTION_ID=${data.azurerm_subscription.current.subscription_id}
 # Azure Resource Group name where the target VM is located
-AZURE_RESOURCE_GROUP=${azurerm_resource_group.pentest.name}
+AZURE_RESOURCE_GROUP=${azurerm_resource_group.attack_sim.name}
 # Name of the target Azure VM
-AZURE_VM_NAME=${azurerm_linux_virtual_machine.pentest.name}
+AZURE_VM_NAME=${azurerm_linux_virtual_machine.attack_sim.name}
 
 
 #=====Penetration Tests Resources=====
 
 #keyvault_config_attack
-KEYVAULT_NAME=${azurerm_key_vault.pentest.name}
+KEYVAULT_NAME=${azurerm_key_vault.attack_sim.name}
 #storage_keys_attack
-STORAGE_ACCOUNT_NAME=${azurerm_storage_account.pentest.name}
+STORAGE_ACCOUNT_NAME=${azurerm_storage_account.attack_sim.name}
 #function_app_config_attack
-FUNCTION_APP_NAME=${azurerm_linux_function_app.pentest.name}
+FUNCTION_APP_NAME=${azurerm_linux_function_app.attack_sim.name}
 #role_assignment_attack
 TARGET_PRINCIPAL_ID=${azuread_service_principal.target_sp.object_id}
 EOF

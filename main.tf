@@ -21,23 +21,16 @@ provider "azurerm" {
   }
 }
 
-module "azure_pentest" {
-  source = "./modules/azure_pentest"
+module "azure_attack_sim" {
+  source = "./modules/azure_attack_sim"
 
   subscription_id = var.subscription_id
+  client_name     = var.client_name
 
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  vm_name             = var.vm_name
-  vm_size             = var.vm_size
-  admin_username      = var.admin_username
-
+  location               = var.location
+  vm_size                = var.vm_size
+  admin_username         = var.admin_username
   vnet_address_space     = var.vnet_address_space
   subnet_address_prefix  = var.subnet_address_prefix
   allowed_ssh_source_ips = var.allowed_ssh_source_ips
-
-  keyvault_name         = var.keyvault_name
-  storage_account_name  = var.storage_account_name
-  function_storage_name = var.function_storage_name
-  function_app_name     = var.function_app_name
 }

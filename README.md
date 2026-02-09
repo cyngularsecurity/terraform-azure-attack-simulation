@@ -49,32 +49,23 @@ az account show --query id --output tsv
 
 ### Module Structure
 
-``` hcl
 
-# Deploy Penetration Testing Infrastructure
-module "azure_pentest" {
-  source = "./modules/azure-pentest"
+```hcl
+# main.tf (root)
+module "azure_attack_sim" {
+  source = "./modules/azure_attack_sim"
 
-  # Required Configuration
-  subscription_id = var.subscription_id  # Get with: az account show --query id -o tsv
+  # Required
+  subscription_id = var.subscription_id
+  client_name     = var.client_name  # 3-8 chars, lowercase alphanumeric
 
-  # Basic Configuration
-  resource_group_name = var.resource_group_name  # Container for all resources
-  location            = var.location              # Azure region (e.g., eastus, westus2)
-  vm_name             = var.vm_name               # VM name
-  vm_size             = var.vm_size               # VM size (Standard_B2s recommended)
-  admin_username      = var.admin_username        # SSH username
-
-  # Network Configuration
-  vnet_address_space     = var.vnet_address_space      # VNet CIDR (e.g., ["10.0.0.0/16"])
-  subnet_address_prefix  = var.subnet_address_prefix   # Subnet CIDR (e.g., ["10.0.1.0/24"])
-  allowed_ssh_source_ips = var.allowed_ssh_source_ips  # Your IP only! 
-
-  # Target Resources (must be globally unique)
-  keyvault_name         = var.keyvault_name          # 3-24 chars, alphanumeric + hyphens
-  storage_account_name  = var.storage_account_name   # 3-24 chars, lowercase alphanumeric only
-  function_storage_name = var.function_storage_name  # 3-24 chars, lowercase alphanumeric only
-  function_app_name     = var.function_app_name      # Globally unique function name
+  # Optional (with defaults)
+  location               = var.location                # Default: "eastus"
+  vm_size                = var.vm_size                 # Default: "Standard_B2s"
+  admin_username         = var.admin_username          # Default: "azureuser"
+  vnet_address_space     = var.vnet_address_space      # Default: ["10.0.0.0/16"]
+  subnet_address_prefix  = var.subnet_address_prefix   # Default: ["10.0.1.0/24"]
+  allowed_ssh_source_ips = var.allowed_ssh_source_ips  # Default: ["0.0.0.0/0"] - CHANGE THIS!
 }
 ```
 
@@ -132,25 +123,29 @@ ssh -i ./azure_attack.pem azureuser@<PUBLIC_IP>
 ## Project Structure
 
 ```
-azure-pentest-terraform/
-├── main.tf                          # Root Terraform configuration
-├── variables.tf                     # Root variables
-├── outputs.tf                       # Root outputs
+azure-attack-simulation/
+├── main.tf                          # Root: Calls the module
+├── variables.tf                     # Root: Variable declarations
+├── outputs.tf                       # Root: Exposes module outputs
+├── terraform.tfvars                 # Your configuration (git-ignored)
 ├── .gitignore                       # Git ignore rules
 ├── README.md                        # This file
-├── modules/
-│   └── azure-pentest/               # Main module
-│       ├── main.tf                  # Module configuration
-│       ├── resource_group.tf        # Resource group
-│       ├── network.tf               # Networking resources
-│       ├── vm.tf                    # Virtual machine
-│       ├── ssh_keys.tf              # SSH key generation
-│       ├── iam.tf                   # RBAC roles
-│       ├── target_resources.tf      # Key Vault, Storage, Functions
-│       ├── attack_targets.tf        # Service Principal
-│       ├── variables.tf             # Module variables
-│       └── outputs.tf               # Module outputs
-
+│
+└── modules/
+    └── azure_attack_sim/            # Attack Simulation Module
+        ├── main.tf                  # Provider configuration
+        ├── data.tf                  # Data sources
+        ├── locals.tf                # Random suffix + naming logic
+        ├── variables.tf             # Module input variables
+        ├── resource_group.tf        # Resource group
+        ├── network.tf               # VNet, Subnet, NSG, Public IP
+        ├── ssh_keys.tf              # SSH key generation
+        ├── vm.tf                    # Attack VM with managed identity
+        ├── iam.tf                   # RBAC role assignments
+        ├── target_resources.tf      # Key Vault, Storage, Function App
+        ├── attack_targets.tf        # Target Service Principal
+        ├── graph_api_permissions.tf # Graph API permissions (optional)
+        └── outputs.tf               # Module outputs
 ```
 
 ## Cleanup
