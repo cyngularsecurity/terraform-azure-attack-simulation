@@ -53,7 +53,7 @@ az account show --query id --output tsv
 ```hcl
 # main.tf (root)
 module "azure_attack_sim" {
-  source = "./modules/azure_attack_sim"
+  source = "cyngularsecurity/attack-simulation/azure"
 
   # Required
   subscription_id = var.subscription_id
