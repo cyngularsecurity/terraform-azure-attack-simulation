@@ -22,7 +22,7 @@ provider "azurerm" {
 }
 
 module "azure_attack_sim" {
-  source  = "./modules/attack-simulation/"
+  source  = "./modules/azure_attack_sim/"
 
   subscription_id = var.subscription_id
   client_name     = var.client_name
