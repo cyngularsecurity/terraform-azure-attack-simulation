@@ -1,16 +1,16 @@
-resource "tls_private_key" "pentest_ssh" {
+resource "tls_private_key" "attack_sim_ssh" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "local_file" "private_key" {
-  content         = tls_private_key.pentest_ssh.private_key_pem
+  content         = tls_private_key.attack_sim_ssh.private_key_pem
   filename        = "${path.root}/azure_attack.pem"
   file_permission = "0600"
 }
 
 resource "local_file" "public_key" {
-  content         = tls_private_key.pentest_ssh.public_key_openssh
+  content         = tls_private_key.attack_sim_ssh.public_key_openssh
   filename        = "${path.root}/azure_attack.pub"
   file_permission = "0644"
 }

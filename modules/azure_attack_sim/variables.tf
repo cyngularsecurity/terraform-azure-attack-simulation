@@ -5,7 +5,7 @@ variable "subscription_id" {
 }
 
 variable "client_name" {
-  description = "Client name for resource naming (3-8 chars, lowercase alphanumeric only)"
+  description = "Client name for resource naming (max 8 chars, lowercase alphanumeric only for storage compatibility)"
   type        = string
 
   validation {
@@ -15,7 +15,7 @@ variable "client_name" {
 
   validation {
     condition     = can(regex("^[a-z0-9]+$", var.client_name))
-    error_message = "Client name must be lowercase alphanumeric only"
+    error_message = "Client name must be lowercase alphanumeric only (no hyphens, underscores, or special characters)"
   }
 }
 
@@ -50,7 +50,7 @@ variable "subnet_address_prefix" {
 }
 
 variable "allowed_ssh_source_ips" {
-  description = "List of source IP addresses allowed to SSH"
+  description = "List of source IP addresses allowed to SSH (use [\"0.0.0.0/0\"] for any, but restrict in production)"
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
