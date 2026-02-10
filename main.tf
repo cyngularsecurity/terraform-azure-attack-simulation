@@ -10,27 +10,57 @@ terraform {
       source  = "hashicorp/azuread"
       version = "3.2.0"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "4.1.0"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "2.6.1"
+    }
   }
 }
 
 provider "azurerm" {
+  subscription_id = var.subscription_id
   features {
     key_vault {
       purge_soft_delete_on_destroy = true
     }
   }
 }
+resource "local_file" "dotenv" {
+  filename        = "${path.root}/.env"
+  file_permission = "0600"
+  content         = <<-EOF
 
-module "azure_attack_sim" {
-  source  = "./modules/azure_attack_sim/"
+#=====SSH Connection Settings=====
 
-  subscription_id = var.subscription_id
-  client_name     = var.client_name
+# Path to the SSH private key for the target VM
+SSH_KEY_PATH=./azure_attack.pem
+# Public IP address of the target Azure VM
+AZURE_VM_PUBLIC_IP=${azurerm_public_ip.attack_sim.ip_address}
+AZURE_VM_USERNAME=${var.admin_username}
 
-  location               = var.location
-  vm_size                = var.vm_size
-  admin_username         = var.admin_username
-  vnet_address_space     = var.vnet_address_space
-  subnet_address_prefix  = var.subnet_address_prefix
-  allowed_ssh_source_ips = var.allowed_ssh_source_ips
+#=====Azure Environment Settings=====
+
+# Azure Subscription ID where the target resources are located
+AZURE_SUBSCRIPTION_ID=${data.azurerm_subscription.current.subscription_id}
+# Azure Resource Group name where the target VM is located
+AZURE_RESOURCE_GROUP=${azurerm_resource_group.attack_sim.name}
+# Name of the target Azure VM
+AZURE_VM_NAME=${azurerm_linux_virtual_machine.attack_sim.name}
+
+
+#=====Penetration Tests Resources=====
+
+#keyvault_config_attack
+KEYVAULT_NAME=${azurerm_key_vault.attack_sim.name}
+#storage_keys_attack
+STORAGE_ACCOUNT_NAME=${azurerm_storage_account.attack_sim.name}
+#function_app_config_attack
+FUNCTION_APP_NAME=${azurerm_linux_function_app.attack_sim.name}
+#role_assignment_attack
+TARGET_PRINCIPAL_ID=${azuread_service_principal.target_sp.object_id}
+EOF
 }
