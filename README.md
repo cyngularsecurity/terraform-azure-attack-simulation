@@ -69,7 +69,6 @@ module "azure_attack_sim" {
 }
 ```
 
-
 ## Usage
 
 ### 1. Initialize Terraform
@@ -124,27 +123,21 @@ ssh -i ./azure_attack.pem azureuser@<PUBLIC_IP>
 
 ```
 azure-attack-simulation/
-├── main.tf                          # Root: Calls the module
-├── variables.tf                     # Root: Variable declarations
-├── outputs.tf                       # Root: Exposes module outputs
-├── terraform.tfvars                 # Your configuration (git-ignored)
-├── .gitignore                       # Git ignore rules
-├── README.md                        # This file
-│
-└── modules/
-    └── azure_attack_sim/            # Attack Simulation Module
-        ├── main.tf                  # Provider configuration
-        ├── data.tf                  # Data sources
-        ├── locals.tf                # Random suffix + naming logic
-        ├── variables.tf             # Module input variables
-        ├── resource_group.tf        # Resource group
-        ├── network.tf               # VNet, Subnet, NSG, Public IP
-        ├── ssh_keys.tf              # SSH key generation
-        ├── vm.tf                    # Attack VM with managed identity
-        ├── iam.tf                   # RBAC role assignments
-        ├── target_resources.tf      # Key Vault, Storage, Function App
-        ├── attack_targets.tf        # Target Service Principal
-        └── outputs.tf               # Module outputs
+├── examples                 # Example configuration you can use for module call
+├── .gitignore               # Git ignore rules
+├── README.md                # This file
+├── main.tf                  # Provider configuration
+├── data.tf                  # Data sources
+├── locals.tf                # Random suffix + naming logic
+├── variables.tf             # Module input variables
+├── resource_group.tf        # Resource group
+├── network.tf               # VNet, Subnet, NSG, Public IP
+├── ssh_keys.tf              # SSH key generation
+├── vm.tf                    # Attack VM with managed identity
+├── iam.tf                   # RBAC role assignments
+├── target_resources.tf      # Key Vault, Storage, Function App
+├── attack_targets.tf        # Target Service Principal
+└── outputs.tf               # Module outputs
 ```
 
 ## Cleanup
