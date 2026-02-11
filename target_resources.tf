@@ -63,6 +63,10 @@ resource "azurerm_linux_function_app" "attack_sim" {
       python_version = "3.11"
     }
 
+    auth_settings_v2 {
+      auth_enabled = false
+    }
+
     cors {
       allowed_origins = ["*"]
     }

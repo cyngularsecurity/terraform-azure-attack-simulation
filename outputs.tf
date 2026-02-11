@@ -143,15 +143,15 @@ EOT
 output "deployment_summary" {
   description = "Summary of deployed resources"
   value = {
-    client            = var.client_name
-    suffix            = local.name_suffix
-    resource_group    = azurerm_resource_group.attack_sim.name
-    location          = azurerm_resource_group.attack_sim.location
-    vm_name           = azurerm_linux_virtual_machine.attack_sim.name
-    vm_ip             = azurerm_public_ip.attack_sim.ip_address
-    ssh_key_location  = abspath(local_file.private_key.filename)
-    keyvault          = azurerm_key_vault.attack_sim.name
-    storage           = azurerm_storage_account.attack_sim.name
-    function_app      = azurerm_linux_function_app.attack_sim.name
+    client           = var.client_name
+    suffix           = local.name_suffix
+    resource_group   = azurerm_resource_group.attack_sim.name
+    location         = azurerm_resource_group.attack_sim.location
+    vm_name          = azurerm_linux_virtual_machine.attack_sim.name
+    vm_ip            = azurerm_public_ip.attack_sim.ip_address
+    ssh_key_location = abspath(local_file.private_key.filename)
+    keyvault         = azurerm_key_vault.attack_sim.name
+    storage          = azurerm_storage_account.attack_sim.name
+    function_app     = azurerm_linux_function_app.attack_sim.name
   }
 }
