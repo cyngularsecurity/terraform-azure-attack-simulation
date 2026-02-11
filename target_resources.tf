@@ -57,14 +57,9 @@ resource "azurerm_linux_function_app" "attack_sim" {
   identity {
     type = "SystemAssigned"
   }
-
   site_config {
     application_stack {
       python_version = "3.11"
-    }
-
-    auth_settings_v2 {
-      auth_enabled = false
     }
 
     cors {
