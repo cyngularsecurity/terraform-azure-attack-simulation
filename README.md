@@ -1,6 +1,6 @@
-# Azure Penetration Testing - Terraform Configuration
+# Azure Attack Simulation - Terraform Configuration
 
-This Terraform configuration automates the setup of Azure resources for penetration testing.
+This Terraform configuration automates the setup of Azure resources for attack simulation.
 
 ## Prerequisites
 
