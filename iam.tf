@@ -16,9 +16,18 @@ resource "azurerm_role_assignment" "vm_user_access_admin" {
   principal_id         = azurerm_linux_virtual_machine.attack_sim.identity[0].principal_id
 }
 
+resource "azuread_app_role_assignment" "function_msgraph_ownedby" {
+  app_role_id         = data.azuread_service_principal.msgraph.app_role_ids["Application.ReadWrite.OwnedBy"]
+  principal_object_id = azurerm_linux_function_app.attack_sim.identity[0].principal_id
+  resource_object_id  = data.azuread_service_principal.msgraph.object_id
 
-resource "azuread_app_role_assignment" "vm_graph_app_readwrite" {
-  app_role_id         = data.azuread_service_principal.msgraph.app_role_ids["Application.ReadWrite.All"]
+  depends_on = [
+    azurerm_linux_function_app.attack_sim
+  ]
+}
+
+resource "azuread_app_role_assignment" "vm_graph_app_readwrite_owned" {
+  app_role_id         = data.azuread_service_principal.msgraph.app_role_ids["Application.ReadWrite.OwnedBy"]
   principal_object_id = azurerm_linux_virtual_machine.attack_sim.identity[0].principal_id
   resource_object_id  = data.azuread_service_principal.msgraph.object_id
 
