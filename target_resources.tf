@@ -59,7 +59,7 @@ resource "azurerm_linux_function_app" "attack_sim" {
   }
   site_config {
     application_stack {
-      python_version = "3.11"
+      python_version = "3.10"
     }
 
     cors {
@@ -74,6 +74,13 @@ resource "azurerm_linux_function_app" "attack_sim" {
     "FUNCTIONS_EXTENSION_VERSION"    = "~4"
     "ENABLE_ORYX_BUILD"              = "true"
     "SCM_DO_BUILD_DURING_DEPLOYMENT" = "true"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      auth_settings,
+      auth_settings_v2
+    ]
   }
 
   tags = local.common_tags
