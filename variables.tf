@@ -31,6 +31,12 @@ variable "vm_size" {
   default     = "Standard_B2s"
 }
 
+variable "function_app_sku" {
+  description = "The SKU for the Function App Service Plan (e.g., B1, S1, P1v2). Must support Linux."
+  type        = string
+  default     = "B1"
+}
+
 variable "admin_username" {
   description = "Admin username for the VM"
   type        = string
