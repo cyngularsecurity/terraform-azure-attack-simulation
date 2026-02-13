@@ -107,7 +107,7 @@ function_app_sku = "Y1"  # or "S1"
 
 ```hcl
 module "azure_attack_sim" {
-     source  = "cyngularsecurity/attack-simulation/azure"
+  source  = "cyngularsecurity/attack-simulation/azure"
 
   # Required
   subscription_id = "client-subscription-id"
