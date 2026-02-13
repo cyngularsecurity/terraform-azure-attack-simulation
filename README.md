@@ -49,6 +49,17 @@ az account show --query id --output tsv
 
 ### Module Structure
 
+ Basic Deployment (Dedicated Plan)
+
+```hcl
+module "azure_attack_sim" {
+  source  = "cyngularsecurity/attack-simulation/azure"
+
+  # Required
+  subscription_id = "client-subscription-id"
+  client_name     = "client_name"  # 3-8 chars, lowercase alphanumeric
+}
+```
 
 ```hcl
 # main.tf (root)
@@ -62,10 +73,47 @@ module "azure_attack_sim" {
   # Optional (with defaults)
   location               = var.location                # Default: "eastus"
   vm_size                = var.vm_size                 # Default: "Standard_B2s"
+  function_app_sku       = var.function_app_sku        # Default: "B1" can be changed to S1, P1v2, P1v3 if writable filesystem needed, or to Y1 if not
   admin_username         = var.admin_username          # Default: "azureuser"
   vnet_address_space     = var.vnet_address_space      # Default: ["10.0.0.0/16"]
   subnet_address_prefix  = var.subnet_address_prefix   # Default: ["10.0.1.0/24"]
-  allowed_ssh_source_ips = var.allowed_ssh_source_ips  # Default: ["0.0.0.0/0"] - CHANGE THIS!
+  allowed_ssh_source_ips = var.allowed_ssh_source_ips  # Default: ["0.0.0.0/0"] - CHANGE THIS to ["YOUR_IP/32"]!
+}
+```
+
+### For VFS Attack Testing: Use Standard (S1) or Basic (B1)
+
+For full VFS (Virtual File System) attack capabilities:
+
+```hcl
+module "azure_attack_sim" {
+  source           = "..."
+  function_app_sku = "B1"  # Writable filesystem
+}
+```
+
+### Enterprise Subscriptions
+
+If you get this error:
+```
+Error: Basic tier is not allowed in this subscription
+```
+
+Use Consumption (Y1) or Standard (S1):
+```hcl
+function_app_sku = "Y1"  # or "S1"
+```
+### Consumption Plan (Y1)
+
+```hcl
+module "azure_attack_sim" {
+  source  = "cyngularsecurity/attack-simulation/azure"
+
+  # Required
+  subscription_id = "client-subscription-id"
+  client_name     = "client_name"
+
+  function_app_sku = "Y1"
 }
 ```
 
@@ -105,12 +153,15 @@ terraform output ssh_connection_command
 
 ```
 
-### Generated Files (Git-ignored)
+### Generated Files (Git-Ignored)
 
-These files contain sensitive data and should **never** be committed:
-- `azure_attack.pem` - SSH private key
+These files contain sensitive data:
+- `azure_attack.pem` - SSH private key ⚠️
 - `azure_attack.pub` - SSH public key
+- `terraform.tfstate` - Terraform state ⚠️
 - `.env` - Environment variables
+- `func_deploy/` - Function deployment files
+- `function.zip` - Packaged function code
 
 ### 5. Connect to VM
 
