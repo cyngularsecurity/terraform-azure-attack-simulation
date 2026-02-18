@@ -1,16 +1,19 @@
 resource "azurerm_key_vault" "attack_sim" {
-  name                       = local.keyvault_name
-  resource_group_name        = azurerm_resource_group.attack_sim.name
-  location                   = azurerm_resource_group.attack_sim.location
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  sku_name                   = "standard"
-  rbac_authorization_enabled = false
-  purge_protection_enabled   = false
-  soft_delete_retention_days = 7
+  name                          = local.keyvault_name
+  resource_group_name           = azurerm_resource_group.attack_sim.name
+  location                      = azurerm_resource_group.attack_sim.location
+  tenant_id                     = data.azurerm_client_config.current.tenant_id
+  sku_name                      = "standard"
+  rbac_authorization_enabled    = true
+  public_network_access_enabled = false
+  purge_protection_enabled      = false
+  soft_delete_retention_days    = 7
 
   network_acls {
     bypass         = "AzureServices"
-    default_action = "Allow"
+    default_action = "Deny"
+
+    virtual_network_subnet_ids = [azurerm_subnet.attack_sim.id]
   }
 
   tags = local.common_tags
@@ -145,7 +148,7 @@ PYTHON
 }
 
 resource "local_file" "func_ignore" {
-  content = <<-IGNORE
+  content  = <<-IGNORE
 .git*
 .vscode
 __pycache__
