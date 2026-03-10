@@ -65,6 +65,26 @@ module "azure_attack_sim" {
   subscription_id = "your-subscription-id"
   client_name     = "clienta"  # 3-8 chars, lowercase alphanumeric
 }
+
+output "deployment_summary" {
+  value = module.azure_attack_sim.deployment_summary
+}
+
+output "keyvault_name" {
+  value = module.azure_attack_sim.keyvault_name
+}
+
+output "function_app_name" {
+  value = module.azure_attack_sim.function_app_name
+}
+
+ output "ssh_connection_command" {
+  value = module.azure_attack_sim.ssh_connection_command
+}
+
+output "vm_public_ip" {
+  value = module.azure_attack_sim.vm_public_ip
+}
 ```
 
 ### Full Configuration (All Options)
@@ -85,6 +105,26 @@ module "azure_attack_sim" {
   vnet_address_space     = ["10.0.0.0/16"]       # VNet CIDR
   subnet_address_prefix  = ["10.0.1.0/24"]       # Subnet CIDR
   allowed_ssh_source_ips = ["YOUR_IP/32"]        # Restrict SSH access!
+}
+
+output "deployment_summary" {
+  value = module.azure_attack_sim.deployment_summary
+}
+
+output "keyvault_name" {
+  value = module.azure_attack_sim.keyvault_name
+}
+
+output "function_app_name" {
+  value = module.azure_attack_sim.function_app_name
+}
+
+ output "ssh_connection_command" {
+  value = module.azure_attack_sim.ssh_connection_command
+}
+
+output "vm_public_ip" {
+  value = module.azure_attack_sim.vm_public_ip
 }
 ```
 
@@ -153,6 +193,18 @@ module "azure_attack_sim" {
 
   # Set to false if the VM already has Reader/Contributor/UAA roles assigned
   assign_vm_roles = true
+}
+
+output "deployment_summary" {
+  value = module.azure_attack_sim.deployment_summary
+}
+
+output "keyvault_name" {
+  value = module.azure_attack_sim.keyvault_name
+}
+
+output "function_app_name" {
+  value = module.azure_attack_sim.function_app_name
 }
 ```
 
