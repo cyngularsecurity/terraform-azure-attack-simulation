@@ -60,3 +60,61 @@ variable "allowed_ssh_source_ips" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
+
+# Bring-your-own-VM configuration
+
+variable "create_vm" {
+  description = "Whether to create the VM and its network stack. Set to false for bring-your-own-VM."
+  type        = bool
+  default     = true
+}
+
+variable "existing_resource_group_name" {
+  description = "Name of an existing resource group (required when create_vm = false)"
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.existing_resource_group_name != null || var.create_vm
+    error_message = "existing_resource_group_name is required when create_vm = false."
+  }
+}
+
+variable "existing_resource_group_location" {
+  description = "Location of the existing resource group (required when create_vm = false)"
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.existing_resource_group_location != null || var.create_vm
+    error_message = "existing_resource_group_location is required when create_vm = false."
+  }
+}
+
+variable "existing_subnet_id" {
+  description = "Subnet ID for Key Vault network ACL (required when create_vm = false)"
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.existing_subnet_id != null || var.create_vm
+    error_message = "existing_subnet_id is required when create_vm = false."
+  }
+}
+
+variable "assign_vm_roles" {
+  description = "Whether to create role assignments for the VM identity. Set to false if roles already exist."
+  type        = bool
+  default     = true
+}
+
+variable "existing_vm_principal_id" {
+  description = "Managed identity principal ID of the existing VM (required when create_vm = false)"
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.existing_vm_principal_id != null || var.create_vm
+    error_message = "existing_vm_principal_id is required when create_vm = false."
+  }
+}
