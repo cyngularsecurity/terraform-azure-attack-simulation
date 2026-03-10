@@ -11,42 +11,42 @@ output "name_suffix" {
 
 output "resource_group_name" {
   description = "Name of the resource group"
-  value       = azurerm_resource_group.attack_sim.name
+  value       = local.resource_group_name
 }
 
 output "vm_name" {
   description = "Name of the VM"
-  value       = azurerm_linux_virtual_machine.attack_sim.name
+  value       = var.create_vm ? azurerm_linux_virtual_machine.attack_sim[0].name : null
 }
 
 output "vm_public_ip" {
   description = "Public IP address of the VM"
-  value       = azurerm_public_ip.attack_sim.ip_address
+  value       = var.create_vm ? azurerm_public_ip.attack_sim[0].ip_address : null
 }
 
 output "vm_admin_username" {
   description = "Admin username for SSH"
-  value       = var.admin_username
+  value       = var.create_vm ? var.admin_username : null
 }
 
 output "vm_principal_id" {
   description = "Principal ID of the VM's managed identity"
-  value       = azurerm_linux_virtual_machine.attack_sim.identity[0].principal_id
+  value       = local.vm_principal_id
 }
 
 output "ssh_private_key_path" {
   description = "Path to the SSH private key on your local machine"
-  value       = abspath(local_file.private_key.filename)
+  value       = var.create_vm ? abspath(local_file.private_key[0].filename) : null
 }
 
 output "ssh_public_key_path" {
   description = "Path to the SSH public key on your local machine"
-  value       = abspath(local_file.public_key.filename)
+  value       = var.create_vm ? abspath(local_file.public_key[0].filename) : null
 }
 
 output "ssh_connection_command" {
   description = "SSH connection command"
-  value       = "ssh -i ${abspath(local_file.private_key.filename)} ${var.admin_username}@${azurerm_public_ip.attack_sim.ip_address}"
+  value       = var.create_vm ? "ssh -i ${abspath(local_file.private_key[0].filename)} ${var.admin_username}@${azurerm_public_ip.attack_sim[0].ip_address}" : null
 }
 
 output "subscription_id" {
@@ -111,20 +111,20 @@ output "env_file_content" {
 #=====SSH Connection Settings=====
 
 # Path to the SSH private key for the target VM
-SSH_KEY_PATH=${abspath(local_file.private_key.filename)}
+SSH_KEY_PATH=${var.create_vm ? abspath(local_file.private_key[0].filename) : "N/A"}
 # Public IP address of the target Azure VM
-AZURE_VM_PUBLIC_IP=${azurerm_public_ip.attack_sim.ip_address}
+AZURE_VM_PUBLIC_IP=${var.create_vm ? azurerm_public_ip.attack_sim[0].ip_address : "N/A"}
 # SSH username for the target VM
-AZURE_VM_USERNAME=${var.admin_username}
+AZURE_VM_USERNAME=${var.create_vm ? var.admin_username : "N/A"}
 
 #=====Azure Environment Settings=====
 
 # Azure Subscription ID where the target resources are located
 AZURE_SUBSCRIPTION_ID=${data.azurerm_subscription.current.subscription_id}
 # Azure Resource Group name where the target VM is located
-AZURE_RESOURCE_GROUP=${azurerm_resource_group.attack_sim.name}
+AZURE_RESOURCE_GROUP=${local.resource_group_name}
 # Name of the target Azure VM
-AZURE_VM_NAME=${azurerm_linux_virtual_machine.attack_sim.name}
+AZURE_VM_NAME=${var.create_vm ? azurerm_linux_virtual_machine.attack_sim[0].name : "N/A"}
 
 
 #=====Attack Simulation Target Resources=====
@@ -145,11 +145,11 @@ output "deployment_summary" {
   value = {
     client           = var.client_name
     suffix           = local.name_suffix
-    resource_group   = azurerm_resource_group.attack_sim.name
-    location         = azurerm_resource_group.attack_sim.location
-    vm_name          = azurerm_linux_virtual_machine.attack_sim.name
-    vm_ip            = azurerm_public_ip.attack_sim.ip_address
-    ssh_key_location = abspath(local_file.private_key.filename)
+    resource_group   = local.resource_group_name
+    location         = local.resource_group_location
+    vm_name          = var.create_vm ? azurerm_linux_virtual_machine.attack_sim[0].name : "N/A (client-managed)"
+    vm_ip            = var.create_vm ? azurerm_public_ip.attack_sim[0].ip_address : "N/A (client-managed)"
+    ssh_key_location = var.create_vm ? abspath(local_file.private_key[0].filename) : "N/A (client-managed)"
     keyvault         = azurerm_key_vault.attack_sim.name
     storage          = azurerm_storage_account.attack_sim.name
     function_app     = azurerm_linux_function_app.attack_sim.name

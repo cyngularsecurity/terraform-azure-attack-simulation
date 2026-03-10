@@ -37,19 +37,19 @@ resource "local_file" "dotenv" {
 #=====SSH Connection Settings=====
 
 # Path to the SSH private key for the target VM
-SSH_KEY_PATH=./azure_attack.pem
+SSH_KEY_PATH=${var.create_vm ? "./azure_attack.pem" : "N/A"}
 # Public IP address of the target Azure VM
-AZURE_VM_PUBLIC_IP=${azurerm_public_ip.attack_sim.ip_address}
-AZURE_VM_USERNAME=${var.admin_username}
+AZURE_VM_PUBLIC_IP=${var.create_vm ? azurerm_public_ip.attack_sim[0].ip_address : "N/A"}
+AZURE_VM_USERNAME=${var.create_vm ? var.admin_username : "N/A"}
 
 #=====Azure Environment Settings=====
 
 # Azure Subscription ID where the target resources are located
 AZURE_SUBSCRIPTION_ID=${data.azurerm_subscription.current.subscription_id}
 # Azure Resource Group name where the target VM is located
-AZURE_RESOURCE_GROUP=${azurerm_resource_group.attack_sim.name}
+AZURE_RESOURCE_GROUP=${local.resource_group_name}
 # Name of the target Azure VM
-AZURE_VM_NAME=${azurerm_linux_virtual_machine.attack_sim.name}
+AZURE_VM_NAME=${var.create_vm ? azurerm_linux_virtual_machine.attack_sim[0].name : "N/A"}
 
 
 #=====Penetration Tests Resources=====
