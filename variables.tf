@@ -43,6 +43,13 @@ variable "admin_username" {
   default     = "azureuser"
 }
 
+variable "admin_password" {
+  description = "Admin password for the VM (must be 12+ chars with uppercase, lowercase, number, and special character)"
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
 variable "vnet_address_space" {
   description = "Address space for the virtual network"
   type        = list(string)

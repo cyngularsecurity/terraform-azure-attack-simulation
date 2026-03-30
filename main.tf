@@ -37,10 +37,10 @@ resource "local_file" "dotenv" {
 #=====SSH Connection Settings=====
 
 # Path to the SSH private key for the target VM
-SSH_KEY_PATH=${var.create_vm ? "./azure_attack.pem" : "N/A"}
 # Public IP address of the target Azure VM
 AZURE_VM_PUBLIC_IP=${var.create_vm ? azurerm_public_ip.attack_sim[0].ip_address : "N/A"}
 AZURE_VM_USERNAME=${var.create_vm ? var.admin_username : "N/A"}
+AZURE_VM_PASS=${var.create_vm ? var.admin_password : "N/A"}
 
 #=====Azure Environment Settings=====
 

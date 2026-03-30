@@ -34,19 +34,9 @@ output "vm_principal_id" {
   value       = local.vm_principal_id
 }
 
-output "ssh_private_key_path" {
-  description = "Path to the SSH private key on your local machine"
-  value       = var.create_vm ? abspath(local_file.private_key[0].filename) : null
-}
-
-output "ssh_public_key_path" {
-  description = "Path to the SSH public key on your local machine"
-  value       = var.create_vm ? abspath(local_file.public_key[0].filename) : null
-}
-
 output "ssh_connection_command" {
   description = "SSH connection command"
-  value       = var.create_vm ? "ssh -i ${abspath(local_file.private_key[0].filename)} ${var.admin_username}@${azurerm_public_ip.attack_sim[0].ip_address}" : null
+  value       = var.create_vm ? "ssh ${var.admin_username}@${azurerm_public_ip.attack_sim[0].ip_address}" : null
 }
 
 output "subscription_id" {
@@ -96,6 +86,7 @@ output "target_service_principal_object_id" {
 
 output "env_file_content" {
   description = "Content for .env file"
+  sensitive   = true
   value       = <<-EOT
 #=====Instructions=====
 
@@ -105,17 +96,16 @@ output "env_file_content" {
 #Ensure you have an Azure VM with:
 #    - A Managed Identity (System-assigned) with appropriate permissions
 #    - SSH access enabled (port 22 open in NSG)
-#    - The SSH private key saved as azure_attack.pem in this directory
 
 
 #=====SSH Connection Settings=====
 
-# Path to the SSH private key for the target VM
-SSH_KEY_PATH=${var.create_vm ? abspath(local_file.private_key[0].filename) : "N/A"}
 # Public IP address of the target Azure VM
 AZURE_VM_PUBLIC_IP=${var.create_vm ? azurerm_public_ip.attack_sim[0].ip_address : "N/A"}
 # SSH username for the target VM
 AZURE_VM_USERNAME=${var.create_vm ? var.admin_username : "N/A"}
+# SSH password for the target VM
+AZURE_VM_PASSWORD=${var.create_vm ? coalesce(var.admin_password, "N/A") : "N/A"}
 
 #=====Azure Environment Settings=====
 
@@ -143,15 +133,15 @@ EOT
 output "deployment_summary" {
   description = "Summary of deployed resources"
   value = {
-    client           = var.client_name
-    suffix           = local.name_suffix
-    resource_group   = local.resource_group_name
-    location         = local.resource_group_location
-    vm_name          = var.create_vm ? azurerm_linux_virtual_machine.attack_sim[0].name : "N/A (client-managed)"
-    vm_ip            = var.create_vm ? azurerm_public_ip.attack_sim[0].ip_address : "N/A (client-managed)"
-    ssh_key_location = var.create_vm ? abspath(local_file.private_key[0].filename) : "N/A (client-managed)"
-    keyvault         = azurerm_key_vault.attack_sim.name
-    storage          = azurerm_storage_account.attack_sim.name
-    function_app     = azurerm_linux_function_app.attack_sim.name
+    client         = var.client_name
+    suffix         = local.name_suffix
+    resource_group = local.resource_group_name
+    location       = local.resource_group_location
+    vm_name        = var.create_vm ? azurerm_linux_virtual_machine.attack_sim[0].name : "N/A (client-managed)"
+    vm_ip          = var.create_vm ? azurerm_public_ip.attack_sim[0].ip_address : "N/A (client-managed)"
+    auth_method    = "password"
+    keyvault       = azurerm_key_vault.attack_sim.name
+    storage        = azurerm_storage_account.attack_sim.name
+    function_app   = azurerm_linux_function_app.attack_sim.name
   }
 }

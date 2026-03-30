@@ -34,16 +34,6 @@ output "vm_principal_id" {
   value       = module.azure_attack_sim.vm_principal_id
 }
 
-output "ssh_private_key_path" {
-  description = "Path to the SSH private key"
-  value       = module.azure_attack_sim.ssh_private_key_path
-}
-
-output "ssh_public_key_path" {
-  description = "Path to the SSH public key"
-  value       = module.azure_attack_sim.ssh_public_key_path
-}
-
 output "ssh_connection_command" {
   description = "SSH connection command"
   value       = module.azure_attack_sim.ssh_connection_command

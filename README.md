@@ -64,6 +64,7 @@ module "azure_attack_sim" {
 
   subscription_id = "your-subscription-id"
   client_name     = "clienta"  # 3-8 chars, lowercase alphanumeric
+  admin_password  = "password"
 }
 
 output "deployment_summary" {
@@ -101,7 +102,8 @@ module "azure_attack_sim" {
   location               = "eastus"              # Azure region
   vm_size                = "Standard_B2s"        # VM size
   function_app_sku       = "B1"                  # B1/S1 for writable filesystem, Y1 for consumption
-  admin_username         = "azureuser"           # SSH username
+  admin_username         = "azureuser"           # VM username
+  admin_password         = var.admin_password     # VM password (12+ chars, mixed case, number, special)
   vnet_address_space     = ["10.0.0.0/16"]       # VNet CIDR
   subnet_address_prefix  = ["10.0.1.0/24"]       # Subnet CIDR
   allowed_ssh_source_ips = ["YOUR_IP/32"]        # Restrict SSH access!
@@ -137,7 +139,8 @@ output "vm_public_ip" {
 | `location` | No | `eastus` | Azure region |
 | `vm_size` | No | `Standard_B2s` | VM size |
 | `function_app_sku` | No | `B1` | Function App SKU (B1, S1, P1v2, Y1) |
-| `admin_username` | No | `azureuser` | SSH username |
+| `admin_username` | No | `azureuser` | VM username |
+| `admin_password` | No | `null` | VM password (12+ chars, uppercase, lowercase, number, special) |
 | `vnet_address_space` | No | `["10.0.0.0/16"]` | VNet address space |
 | `subnet_address_prefix` | No | `["10.0.1.0/24"]` | Subnet address prefix |
 | `allowed_ssh_source_ips` | No | `["0.0.0.0/0"]` | IPs allowed to SSH |
@@ -146,8 +149,7 @@ output "vm_public_ip" {
 
 - Resource Group
 - VNet, Subnet, NSG, Public IP, NIC
-- Linux VM with system-assigned managed identity
-- SSH key pair (saved locally)
+- Linux VM with system-assigned managed identity (password auth)
 - IAM role assignments (Reader, Contributor, User Access Admin, Graph API)
 - Key Vault, Storage Account, Function App, Target Service Principal
 
@@ -232,14 +234,13 @@ output "function_app_name" {
 
 ### What Is NOT Created
 
-- Resource Group, VNet, Subnet, NSG, Public IP, NIC, VM, SSH keys
+- Resource Group, VNet, Subnet, NSG, Public IP, NIC, VM
 
 ### .env Output
 
 When using `create_vm = false`, VM-related fields in the `.env` output will show `N/A` since the client manages those:
 
 ```
-SSH_KEY_PATH=N/A
 AZURE_VM_PUBLIC_IP=N/A
 AZURE_VM_USERNAME=N/A
 AZURE_VM_NAME=N/A
@@ -282,7 +283,7 @@ terraform output -raw env_file_content
 ### 5. Connect to VM
 
 ```bash
-ssh -i ./azure_attack.pem azureuser@<PUBLIC_IP>
+ssh azureuser@<PUBLIC_IP>
 ```
 
 ## Function App SKU Options
@@ -309,7 +310,6 @@ azure-attack-simulation/
 ├── variables.tf             # Module input variables
 ├── resource_group.tf        # Resource group (conditional)
 ├── network.tf               # VNet, Subnet, NSG, Public IP (conditional)
-├── ssh_keys.tf              # SSH key generation (conditional)
 ├── vm.tf                    # Attack VM with managed identity (conditional)
 ├── iam.tf                   # RBAC role assignments (conditional)
 ├── target_resources.tf      # Key Vault, Storage, Function App
@@ -320,8 +320,6 @@ azure-attack-simulation/
 ## Generated Files (Git-Ignored)
 
 These files contain sensitive data:
-- `azure_attack.pem` - SSH private key
-- `azure_attack.pub` - SSH public key
 - `terraform.tfstate` - Terraform state
 - `.env` - Environment variables
 - `func_deploy/` - Function deployment files
@@ -336,11 +334,6 @@ terraform destroy
 ```
 
 ## Troubleshooting
-
-### SSH Permission Errors
-```bash
-chmod 600 ./azure_attack.pem
-```
 
 ### Role Assignment Already Exists (409 Conflict)
 If the VM already has the required role assignments, set:
